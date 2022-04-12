@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,17 +29,23 @@ namespace InvoiceManagement.Controllers
             return await _context.invoices.ToListAsync();
         }
 
-        // GET: api/InvoiceDetails?clientId=1
-        [HttpGet("ClientId/")]
-        public async Task<ActionResult<IEnumerable<InvoiceDetail>>> GetinvoicesByClientId(int ClientId)
+        // GET: api/InvoiceDetails/ByClientIdAndCompanyId?ClientId=1&&CompanyId=2
+        [HttpGet("ByClientIdAndCompanyId/")]
+        public async Task<ActionResult<IEnumerable<InvoiceDetail>>> GetinvoicesByClientIdAndCompanyId(int ClientId, int CompanyId)
         {
-            return await _context.invoices.Where(i => i.ClientId == ClientId).ToListAsync();
+            return await _context.invoices.Where(i => i.ClientId == ClientId && i.CompanyId == CompanyId).ToListAsync();
         }
 
+        // GET: api/InvoiceDetails/ByCompanyId?CompanyId=2
+        [HttpGet("ByCompanyId/")]
+        public async Task<ActionResult<IEnumerable<InvoiceDetail>>> GetinvoicesByCompanyId(int CompanyId)
+        {
+            return await _context.invoices.Where(i => i.CompanyId == CompanyId).ToListAsync();
+        }
 
         // GET: api/InvoiceDetails/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<InvoiceDetail>> GetInvoiceDetail(int id)
+        public async Task<ActionResult<InvoiceDetail>> GetInvoiceDetail(string id)
         {
             var invoiceDetail = await _context.invoices.FindAsync(id);
 
@@ -51,13 +57,12 @@ namespace InvoiceManagement.Controllers
             return invoiceDetail;
         }
 
-
         // PUT: api/InvoiceDetails/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutInvoiceDetail(int id, InvoiceDetail invoiceDetail)
+        public async Task<IActionResult> PutInvoiceDetail(string id, InvoiceDetail invoiceDetail)
         {
-            if (id != invoiceDetail.Id)
+            if (id != invoiceDetail.InvoiceNumber)
             {
                 return BadRequest();
             }
@@ -89,14 +94,28 @@ namespace InvoiceManagement.Controllers
         public async Task<ActionResult<InvoiceDetail>> PostInvoiceDetail(InvoiceDetail invoiceDetail)
         {
             _context.invoices.Add(invoiceDetail);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (InvoiceDetailExists(invoiceDetail.InvoiceNumber))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-            return CreatedAtAction("GetInvoiceDetail", new { id = invoiceDetail.Id }, invoiceDetail);
+            return CreatedAtAction("GetInvoiceDetail", new { id = invoiceDetail.InvoiceNumber }, invoiceDetail);
         }
 
         // DELETE: api/InvoiceDetails/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteInvoiceDetail(int id)
+        public async Task<IActionResult> DeleteInvoiceDetail(string id)
         {
             var invoiceDetail = await _context.invoices.FindAsync(id);
             if (invoiceDetail == null)
@@ -110,11 +129,9 @@ namespace InvoiceManagement.Controllers
             return NoContent();
         }
 
-        private bool InvoiceDetailExists(int id)
+        private bool InvoiceDetailExists(string id)
         {
-            return _context.invoices.Any(e => e.Id == id);
+            return _context.invoices.Any(e => e.InvoiceNumber == id);
         }
-
-
     }
 }

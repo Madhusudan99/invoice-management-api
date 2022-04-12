@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +27,13 @@ namespace InvoiceManagement.Controllers
         public async Task<ActionResult<IEnumerable<Client>>> Getclients()
         {
             return await _context.clients.ToListAsync();
+        }
+
+        // GET: api/Clients/CompanyId?CompanyId=1
+        [HttpGet("CompanyId/")]
+        public async Task<ActionResult<IEnumerable<Client>>> GetclientsByCompanyId(int CompanyId)
+        {
+            return await _context.clients.Where(c => c.CompanyId == CompanyId).ToListAsync();
         }
 
         // GET: api/Clients/5
