@@ -11,6 +11,6 @@ namespace InvoiceManagement.Models
         [Required]
         public string productName { get; set; }
         [Required]
-        public int productPrice { get; set; }
+        public double productPrice { get; set; }
     }
 }
