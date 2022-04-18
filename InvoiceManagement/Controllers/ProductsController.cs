@@ -36,6 +36,13 @@ namespace InvoiceManagement.Controllers
             return await _context.products.Where(p => p.CompanyId == CompanyId).ToListAsync();
         }
 
+        // GET: api/Products/ByCompanyId?CompanyId=2
+        [HttpGet("ByCompanyIdAndProductName/")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetproductsByCompanyIdAndProductName(string productName)
+        {
+            return await _context.products.Where(p => p.productName == productName).ToListAsync();
+        }
+
 
         // GET: api/Products/5
         [HttpGet("{id}")]

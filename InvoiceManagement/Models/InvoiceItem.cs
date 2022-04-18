@@ -16,7 +16,6 @@ namespace InvoiceManagement.Models
 
         [Required]
         public float Tax { get; set; }
-        [Required]
-        public float Amount { get; set; }
+
     }
 }

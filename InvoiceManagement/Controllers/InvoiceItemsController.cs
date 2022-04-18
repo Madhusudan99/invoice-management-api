@@ -80,7 +80,7 @@ namespace InvoiceManagement.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(invoiceItem);
         }
 
         // POST: api/InvoiceItems
